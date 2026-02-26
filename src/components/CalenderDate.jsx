@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
@@ -9,8 +9,13 @@ import "dayjs/locale/th";
 import { RotateCcw, CalendarDays, Calculator, Hash, ChevronRight } from "lucide-react";
 
 // Components
-import Historyfeed from "./Historyfeed";
-import Summery from "./Summery";
+// import Historyfeed from "./Historyfeed";
+// import Summery from "./Summery";
+
+const Historyfeed = lazy(() => import('./Historyfeed'));
+const Summery = lazy(() => import('./Summery'));
+
+// const MyChart = lazy(() => import('./components/MyChart'));
 
 dayjs.locale("th");
 
@@ -60,6 +65,7 @@ export default function CalenderDate() {
 
   const handleCalculate = () => {
     setConfirmedDates({ start: startDate, end: endDate });
+
     const newEntry = {
       id: Date.now(),
       type: "advanced",
@@ -67,18 +73,25 @@ export default function CalenderDate() {
       subject: `${startDate.format("DD/MM/YY")} - ${endDate.format("DD/MM/YY")} (${duration} วัน)`,
       date: dayjs().format("D MMM"),
     };
-    setHistoryList([newEntry, ...historyList]);
+
+    // ปรับตรงนี้: ใส่ของใหม่ไว้ข้างหน้า แล้วตัดเอาแค่ 20 อันแรก
+    setHistoryList((prevList) => {
+      const updatedList = [newEntry, ...prevList];
+      return updatedList.slice(0, 7); // เก็บเฉพาะดัชนีที่ 0 ถึง 19
+    });
   };
 
   return (
+
+
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      
+
       {/* ================= ฝั่งซ้าย: ปฏิทินและการคำนวณ (8 ส่วน) ================= */}
       <div className="lg:col-span-8 flex flex-col gap-8">
-        
+
         {/* กล่องปฏิทินหลัก */}
         <div className="bg-white p-6 md:p-10 rounded-[2rem] shadow-sm border border-gray-100 relative overflow-hidden">
-          
+
           {/* Header ภายในกล่อง */}
           <div className="flex justify-between items-center mb-10 pb-4 border-b border-gray-100 border-dashed">
             <div className="flex items-center gap-3">
@@ -132,7 +145,7 @@ export default function CalenderDate() {
 
           {/* ปุ่มคำนวณ (Minimal Outlined) */}
           <div className="mt-12 flex justify-center">
-            <button 
+            <button
               onClick={handleCalculate}
               className="group flex items-center gap-3 px-10 py-3 border border-gray-200 bg-white text-gray-700 rounded-2xl font-bold text-sm hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/30 active:scale-95 transition-all duration-300"
             >
@@ -143,28 +156,34 @@ export default function CalenderDate() {
           </div>
         </div>
 
-        {/* ส่วนสรุปผล (Summery) */}
+
         <div className="bg-white p-6 md:p-10 rounded-[2rem] shadow-sm border border-gray-100 min-h-[200px]">
-          {confirmedDates ? (
-            <Summery startDate={confirmedDates.start} endDate={confirmedDates.end} />
-          ) : (
-            <div className="py-16 flex flex-col items-center justify-center text-gray-300 gap-3">
-              <div className="p-4 bg-gray-50 rounded-full">
-                <Calculator size={32} strokeWidth={1} />
+          <Suspense fallback={<p>กำลังโหลดกราฟข้อมูล...</p>}>
+            {confirmedDates ? (
+              <Summery startDate={confirmedDates.start} endDate={confirmedDates.end} />
+            ) : (
+              <div className="py-16 flex flex-col items-center justify-center text-gray-300 gap-3">
+                <div className="p-4 bg-gray-50 rounded-full">
+                  <Calculator size={32} strokeWidth={1} />
+                </div>
+                <p className="text-sm font-medium italic">รอการคำนวณ...</p>
               </div>
-              <p className="text-sm font-medium italic">รอการคำนวณ...</p>
-            </div>
-          )}
+            )}
+          </Suspense>
         </div>
+
+
       </div>
 
-      {/* ================= ฝั่งขวา: ประวัติการใช้งาน (4 ส่วน) ================= */}
       <div className="lg:col-span-4 h-fit sticky top-10">
-        <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100">
-          <Historyfeed historyList={historyList} setHistoryList={setHistoryList} />
-        </div>
+        <Suspense fallback={<p>กำลังโหลดกราฟข้อมูล...</p>}>
+          <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <Historyfeed historyList={historyList} setHistoryList={setHistoryList} />
+          </div>
+        </Suspense>
       </div>
 
-    </div>
+    </div >
+
   );
 }
