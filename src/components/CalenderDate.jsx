@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, lazy, Suspense } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
@@ -6,16 +6,9 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 
 // Icons
-import { RotateCcw, CalendarDays, Calculator, Hash, ChevronRight } from "lucide-react";
+import { RotateCcw, CalendarDays, ChevronRight } from "lucide-react";
 
-// Components
-// import Historyfeed from "./Historyfeed";
-// import Summery from "./Summery";
-
-const Historyfeed = lazy(() => import('./Historyfeed'));
 const Summery = lazy(() => import('./Summery'));
-
-// const MyChart = lazy(() => import('./components/MyChart'));
 
 dayjs.locale("th");
 
@@ -24,16 +17,6 @@ export default function CalenderDate() {
   const [startDate, setStartDate] = useState(dayjs());
   const [endDate, setEndDate] = useState(dayjs().add(1, "year"));
   const [duration, setDuration] = useState(endDate.diff(dayjs(), "day"));
-  const [confirmedDates, setConfirmedDates] = useState(null);
-  const [historyList, setHistoryList] = useState(() => {
-    const savedData = localStorage.getItem("app_history");
-    return savedData ? JSON.parse(savedData) : [];
-  });
-
-  // --- Effects ---
-  useEffect(() => {
-    localStorage.setItem("app_history", JSON.stringify(historyList));
-  }, [historyList]);
 
   // --- Logics ---
   const getThaiYear = (date) => date.year() + 543;
@@ -60,130 +43,88 @@ export default function CalenderDate() {
     setStartDate(initialStart);
     setEndDate(initialEnd);
     setDuration(initialEnd.diff(initialStart, "day"));
-    setConfirmedDates(null);
-  };
-
-  const handleCalculate = () => {
-    setConfirmedDates({ start: startDate, end: endDate });
-
-    const newEntry = {
-      id: Date.now(),
-      type: "advanced",
-      title: "คำนวณเบี้ย พ.ร.บ.",
-      subject: `${startDate.format("DD/MM/YY")} - ${endDate.format("DD/MM/YY")} (${duration} วัน)`,
-      date: dayjs().format("D MMM"),
-    };
-
-    // ปรับตรงนี้: ใส่ของใหม่ไว้ข้างหน้า แล้วตัดเอาแค่ 20 อันแรก
-    setHistoryList((prevList) => {
-      const updatedList = [newEntry, ...prevList];
-      return updatedList.slice(0, 7); // เก็บเฉพาะดัชนีที่ 0 ถึง 19
-    });
   };
 
   return (
+    <div className="flex flex-col xl:flex-row gap-6 items-start mx-auto w-full">
 
+      {/* ================= ฝั่งซ้าย: ปฏิทิน + สรุปเบี้ย (Card หลัก) ================= */}
+      <div className="flex-1 w-full bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col xl:flex-row gap-8">
 
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-
-      {/* ================= ฝั่งซ้าย: ปฏิทินและการคำนวณ (8 ส่วน) ================= */}
-      <div className="lg:col-span-8 flex flex-col gap-8">
-
-        {/* กล่องปฏิทินหลัก */}
-        <div className="bg-white p-6 md:p-10 rounded-[2rem] shadow-sm border border-gray-100 relative overflow-hidden">
-
-          {/* Header ภายในกล่อง */}
-          <div className="flex justify-between items-center mb-10 pb-4 border-b border-gray-100 border-dashed">
+        {/* ส่วนปฏิทิน */}
+        <div className="flex-1 xl:border-r xl:border-gray-100 dark:xl:border-gray-700 xl:border-dashed xl:pr-8 relative">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-100 dark:border-gray-700 border-dashed">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-lg text-blue-500">
+              <div className="p-2 text-blue-500">
                 <CalendarDays size={20} />
               </div>
-              <h2 className="text-lg font-bold text-gray-800 tracking-tight">กำหนดระยะเวลา</h2>
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 tracking-tight">กำหนดระยะเวลา</h2>
             </div>
-            <button onClick={handleReset} className="group flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-gray-600 transition-all">
+            <button onClick={handleReset} className="group flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-all">
               <RotateCcw size={14} className="group-hover:rotate-[-45deg] transition-transform" />
               รีเซ็ตค่า
             </button>
           </div>
 
-          {/* ช่องกรอกจำนวนวัน (Minimal Style #1) */}
-          <div className="mb-10 flex justify-center">
+          {/* ช่องกรอกจำนวนวัน */}
+          <div className="mb-8 flex justify-center">
             <div className="flex items-center gap-3 group">
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Duration</span>
               <input
                 type="number"
                 value={duration}
                 onChange={handleDurationChange}
-                className="w-20 bg-transparent text-center text-2xl font-black text-gray-900 border-b-2 border-gray-100 focus:border-blue-500 focus:outline-none transition-all"
+                className="w-20 bg-transparent text-center text-2xl font-black text-gray-900 dark:text-gray-100 border-b-2 border-gray-100 dark:border-gray-700 focus:border-blue-500 focus:outline-none transition-all"
               />
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Days</span>
             </div>
           </div>
 
-          {/* ปฏิทินคู่ */}
+          {/* ปฏิทินคู่ (ซ้าย - ขวา) */}
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
-            <div className="flex flex-wrap justify-around gap-10">
-              {/* ปฏิทินเริ่ม */}
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-2 mb-4 px-4 py-1 bg-blue-50/50 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                  <span className="text-xs font-bold text-blue-700">เริ่มคุ้มครอง ({getThaiYear(startDate)})</span>
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-6">
+
+              {/* ปฏิทินเริ่ม (ซ้าย) */}
+              <div className="flex flex-col items-center bg-gray-50/30 dark:bg-gray-900/50 p-2 rounded-2xl border border-gray-50 dark:border-gray-800">
+                <div className="flex items-center gap-2 mb-2 px-4 py-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="text-xs font-bold text-blue-700 dark:text-blue-400">เริ่ม ({getThaiYear(startDate)})</span>
                 </div>
                 <DateCalendar value={startDate} onChange={handleStartDateChange} views={['year', 'month', 'day']} />
               </div>
 
-              {/* ปฏิทินสิ้นสุด */}
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-2 mb-4 px-4 py-1 bg-green-50/50 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                  <span className="text-xs font-bold text-green-700">สิ้นสุดคุ้มครอง ({getThaiYear(endDate)})</span>
+              {/* ลูกศรคั่นตรงกลาง */}
+              <div className="hidden lg:flex items-center justify-center text-gray-300 dark:text-gray-600">
+                <ChevronRight size={32} strokeWidth={1.5} />
+              </div>
+
+              {/* ปฏิทินสิ้นสุด (ขวา) */}
+              <div className="flex flex-col items-center bg-gray-50/30 dark:bg-gray-900/50 p-2 rounded-2xl border border-gray-50 dark:border-gray-800">
+                <div className="flex items-center gap-2 mb-2 px-4 py-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                  <span className="text-xs font-bold text-green-700 dark:text-green-400">สิ้นสุด ({getThaiYear(endDate)})</span>
                 </div>
                 <DateCalendar value={endDate} onChange={handleEndDateChange} views={['year', 'month', 'day']} minDate={startDate} />
               </div>
+
             </div>
           </LocalizationProvider>
 
-          {/* ปุ่มคำนวณ (Minimal Outlined) */}
-          <div className="mt-12 flex justify-center">
-            <button
-              onClick={handleCalculate}
-              className="group flex items-center gap-3 px-10 py-3 border border-gray-200 bg-white text-gray-700 rounded-2xl font-bold text-sm hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/30 active:scale-95 transition-all duration-300"
-            >
-              <Calculator size={18} className="text-gray-400 group-hover:text-blue-500" />
-              คำนวณเบี้ยประกัน
-              <ChevronRight size={16} className="text-gray-300 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
         </div>
 
-
-        <div className="bg-white p-6 md:p-10 rounded-[2rem] shadow-sm border border-gray-100 min-h-[200px]">
-          <Suspense fallback={<p>กำลังโหลดกราฟข้อมูล...</p>}>
-            {confirmedDates ? (
-              <Summery startDate={confirmedDates.start} endDate={confirmedDates.end} />
-            ) : (
-              <div className="py-16 flex flex-col items-center justify-center text-gray-300 gap-3">
-                <div className="p-4 bg-gray-50 rounded-full">
-                  <Calculator size={32} strokeWidth={1} />
-                </div>
-                <p className="text-sm font-medium italic">รอการคำนวณ...</p>
-              </div>
-            )}
+        {/* ส่วนอัตราเบี้ย (Summary) อัปเดตแบบ Real-time */}
+        <div className="w-full xl:w-[30%] flex flex-col">
+          <Suspense fallback={<p className="text-center text-gray-400 mt-10">กำลังโหลดข้อมูล...</p>}>
+            <div className="h-full">
+              {/* ส่ง startDate และ endDate ไปตรงๆ เลย */}
+              <Summery startDate={startDate} endDate={endDate} />
+            </div>
           </Suspense>
         </div>
 
-
       </div>
 
-      <div className="lg:col-span-4 h-fit sticky top-10">
-        <Suspense fallback={<p>กำลังโหลดกราฟข้อมูล...</p>}>
-          <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100">
-            <Historyfeed historyList={historyList} setHistoryList={setHistoryList} />
-          </div>
-        </Suspense>
-      </div>
-
-    </div >
-
+    </div>
   );
 }

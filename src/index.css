@@ -7,3 +7,153 @@
 
     font-family: "Kanit", sans-serif;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================
+   จัดการ Dark Mode แบบ Global ใน index.css
+   ========================================= */
+
+@layer base {
+  body {
+    @apply transition-colors duration-300;
+  }
+  
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+@layer components {
+
+
+  .dark .bg-white {
+    @apply !bg-gray-800 !border-gray-700;
+  }
+
+  .dark .bg-gray-50,
+  .dark .bg-gray-50\/50,
+  .dark .bg-gray-50\/30 {
+    @apply !bg-gray-900 !border-gray-800;
+  }
+
+  .dark .border-gray-100,
+  .dark .border-gray-200 {
+    @apply !border-gray-700;
+  }
+
+  .dark .text-gray-900,
+  .dark .text-gray-800,
+  .dark .text-gray-700 {
+    @apply !text-gray-100;
+  }
+
+  .dark .text-gray-600,
+  .dark .text-gray-500 {
+    @apply !text-gray-300;
+  }
+
+  .dark button.bg-white:hover {
+    @apply !bg-gray-700;
+  }
+}
+
+/* =========================================
+   ปรับแต่งปฏิทิน MUI (DateCalendar) สำหรับ Dark Mode
+   ========================================= */
+
+@layer components {
+  /* เปลี่ยนสีตัวหนังสือ หัวข้อปฏิทิน ตัวเลขวันที่ และไอคอนลูกศร ให้เป็นสีสว่าง */
+  .dark .MuiTypography-root,
+  .dark .MuiPickersCalendarHeader-label,
+  .dark .MuiPickersDay-root,
+  .dark .MuiPickersYear-yearButton,
+  .dark .MuiPickersMonth-monthButton,
+  .dark .MuiIconButton-root {
+    @apply !text-gray-200;
+  }
+
+  /* ปรับสีตัวอักษรย่อของวัน (อา. จ. อ. พ. ...) ให้ดรอปลงมานิดนึง จะได้ดูสวย */
+  .dark .MuiDayCalendar-weekDayLabel {
+    @apply !text-gray-400;
+  }
+
+  /* สีพื้นหลังของวันที่ตอนเอาเมาส์ชี้ (Hover) */
+  .dark .MuiPickersDay-root:hover,
+  .dark .MuiPickersYear-yearButton:hover,
+  .dark .MuiPickersMonth-monthButton:hover {
+    @apply !bg-gray-700;
+  }
+
+  /* สีของวันที่ถูกเลือก (Selected) ให้เป็นสีน้ำเงินเด่นๆ */
+  .dark .MuiPickersDay-root.Mui-selected,
+  .dark .MuiPickersDay-root.Mui-selected:hover,
+  .dark .MuiPickersDay-root.Mui-selected:focus,
+  .dark .MuiPickersYear-yearButton.Mui-selected,
+  .dark .MuiPickersMonth-monthButton.Mui-selected {
+    @apply !bg-blue-600 !text-white;
+  }
+
+  /* สีขอบของวันที่ปัจจุบัน (Today) */
+  .dark .MuiPickersDay-today {
+    @apply !border-blue-500;
+  }
+
+  /* วันที่ที่ถูกปิดการใช้งาน (Disabled) เช่น วันที่ห้ามกดย้อนหลัง */
+  .dark .MuiPickersDay-root.Mui-disabled,
+  .dark .MuiIconButton-root.Mui-disabled {
+    @apply !text-gray-600 !bg-transparent;
+  }
+}
+
+/* =========================================
+   ตกแต่ง Scrollbar (รองรับทั้ง Light และ Dark Mode)
+   ========================================= */
+
+@layer base {
+  /* สำหรับ Firefox */
+  html {
+    scrollbar-width: thin; /* ทำให้ขนาดเล็กลง */
+    scrollbar-color: #cbd5e1 transparent; /* สีตัวเลื่อน (slate-300) สีพื้นหลัง (โปร่งใส) */
+  }
+
+  /* Firefox โหมดมืด */
+  .dark html {
+    scrollbar-color: #475569 transparent; /* สีตัวเลื่อนโหมดมืด (slate-600) */
+  }
+
+  /* สำหรับ Chrome, Edge, Safari */
+  ::-webkit-scrollbar {
+    width: 6px; /* ความกว้างของ scrollbar แนวตั้ง */
+    height: 6px; /* ความสูงของ scrollbar แนวนอน */
+  }
+
+  /* รางของ Scrollbar (Track) */
+  ::-webkit-scrollbar-track {
+    background: transparent; 
+  }
+
+  /* ตัวเลื่อนของ Scrollbar (Thumb) */
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* สีเทาอ่อน */
+    border-radius: 10px; /* ทำให้ขอบมนสวยงาม */
+  }
+
+  /* ตัวเลื่อนตอนเอาเมาส์ไปชี้ (Hover) */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* สีเข้มขึ้นนิดนึง */
+  }
+
+  /* ---------------------------------
+     ตั้งค่า Scrollbar สำหรับ Dark Mode 
+     --------------------------------- */
+  .dark ::-webkit-scrollbar-thumb {
+    background: #475569; /* สีเทาเข้ม */
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b; /* สีสว่างขึ้นนิดนึงตอนชี้ */
+  }
+}
