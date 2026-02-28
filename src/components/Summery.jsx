@@ -7,7 +7,7 @@ const vehicleTypes = [
   { name: "รย.1 (รถยนต์นั่ง)", basePrice: 645.41, icon: Car },
   { name: "รย.2 (รถโดยสาร)", basePrice: 1182.55, icon: Car },
   { name: "รย.2 (เชิงพาณิชย์)", basePrice: 2493.30, icon: Truck },
-  { name: "รย.3 (กระบะ)", basePrice: 967.48, icon: Truck },
+  { name: "รย.3 (กระบะ)", basePrice: 967.88, icon: Truck },
   { name: "รย.3 (น้ำหนักเกิน 3-6 ตัน)", basePrice: 1310.95, icon: Truck },
   { name: "รย.3 (น้ำหนักเกิน 6-12 ตัน)", basePrice: 1408.32, icon: Truck },
   { name: "รย.3 (น้ำหนักเกิน 12 ตัน)", basePrice: 1826.69, icon: Truck },
